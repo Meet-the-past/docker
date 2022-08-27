@@ -1,0 +1,6 @@
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/Seongnam-AI-Free-Internship-Team-A/frontend.git
+[submodule "backend"]
+	path = backend
+	url = https://github.com/Seongnam-AI-Free-Internship-Team-A/backend.git
