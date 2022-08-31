@@ -1,6 +1,36 @@
 version: "3"
 
 services:
+  db:
+      image: postgres:12.0-alpine
+      volumes:
+        - postgres_data_dev:/var/lib/postgresql/data/
+      environment:
+        POSTGRES_USER: "eg_user"
+        POSTGRES_PASSWORD: "eg_pw"
+        POSTGRES_DB: "eg_db"
+      ports:
+        - 5432:5432
+
+  backend:
+    build:
+      context: ./backend
+      args:
+        DJANGO_ALLOWED_HOSTS: "*"
+        DJANGO_SECRET_KEY: "*"
+        DJANGO_CORS_ORIGIN_WHITELIST: "*"
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend/:/backend/
+    expose:
+      - 8000
+    env_file:
+      - ./settings/dev/.env.dev
+    depends_on:
+      - db
+
   frontend:
     container_name: frontend
     restart: unless-stopped
@@ -22,3 +52,5 @@ services:
 #   dbVolume:           //향후 DB설정 후 추가할 것
 #   build_folder: null
 
+volumes:
+  postgres_data_dev: null
