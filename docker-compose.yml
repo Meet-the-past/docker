@@ -31,23 +31,23 @@ services:
     depends_on:
       - db
 
-  frontend:
-    container_name: frontend
-    restart: unless-stopped
-    build:
-      context: ./frontend
-    command: ["yarn", "start"]
-    ports:
-      - 3000:3000
-    volumes:
-      - ./frontend/:/frontend/
-      #    - build_folder:/frontend/build //배포할때 사용하기
-      - ./frontend/node_modules/:/frontend/node_modules
-    environment:
-      - CI=true
-      - CHOKIDAR_USEPOLLING=true
-      - REACT_APP_BACKEND_URL=http://localhost:8000 #backend주소로 향후 수정하기
-    tty: true
+  # frontend:
+  #   container_name: frontend
+  #   restart: unless-stopped
+  #   build:
+  #     context: ./frontend
+  #   command: ["yarn", "start"]
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - ./frontend/:/frontend/
+  #     #    - build_folder:/frontend/build //배포할때 사용하기
+  #     - ./frontend/node_modules/:/frontend/node_modules
+  #   environment:
+  #     - CI=true
+  #     - CHOKIDAR_USEPOLLING=true
+  #     - REACT_APP_BACKEND_URL=http://localhost:8000 #backend주소로 향후 수정하기
+  #   tty: true
 
 # volumes:
 #   dbVolume:           //향후 DB설정 후 추가할 것
