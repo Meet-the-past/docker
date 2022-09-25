@@ -49,17 +49,6 @@ services:
       - REACT_APP_BACKEND_URL=http://localhost:8000 #backend주소로 향후 수정하기
     tty: true
 
-  prometheus:
-    image: prom/prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    depends_on:
-      - backend
-    ports:
-      - "9090:9090"
-
 # volumes:
 #   dbVolume:           //향후 DB설정 후 추가할 것
 #   build_folder: null
