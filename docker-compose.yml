@@ -1,17 +1,18 @@
+#배포용, for production
 version: "3"
-
 services:
+  # db 컨테이너
   db:
-      image: postgres:12.0-alpine
-      volumes:
-        - postgres_data_dev:/var/lib/postgresql/data/
-      environment:
-        POSTGRES_USER: "eg_user"
-        POSTGRES_PASSWORD: "eg_pw"
-        POSTGRES_DB: "eg_db"
-      ports:
-        - 5432:5432
-
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: "eg_user"
+      POSTGRES_PASSWORD: "eg_pw"
+      POSTGRES_DB: "eg_db"
+    ports:
+      - 5432:5432
+  # Django 컨테이너
   backend:
     build:
       context: ./backend
@@ -19,39 +20,79 @@ services:
         DJANGO_ALLOWED_HOSTS: "*"
         DJANGO_SECRET_KEY: "*"
         DJANGO_CORS_ORIGIN_WHITELIST: "*"
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn backend.wsgi --bind 0.0.0.0:8000
     ports:
       - 8000:8000
     volumes:
+      - static_volume:/backend/staticfiles
+      - media_volume:/backend/mediafiles
       - ./backend/:/backend/
     expose:
       - 8000
     env_file:
-      - ./settings/dev/.env.dev
+      - ./settings/prod/.env.prod
     depends_on:
       - db
-
   frontend:
-    container_name: frontend
-    restart: unless-stopped
     build:
       context: ./frontend
-    command: ["yarn", "start"]
-    ports:
-      - 3000:3000
-    volumes:
-      - ./frontend/:/frontend/
-      #    - build_folder:/frontend/build //배포할때 사용하기
-      - ./frontend/node_modules/:/frontend/node_modules
+      args:
+        API_URL: "*"
+    stdin_open: true
+    tty: true #exit 0 Error
     environment:
-      - CI=true
-      - CHOKIDAR_USEPOLLING=true
-      - REACT_APP_BACKEND_URL=http://localhost:8000 #backend주소로 향후 수정하기
-    tty: true
-
-# volumes:
-#   dbVolume:           //향후 DB설정 후 추가할 것
-#   build_folder: null
-
+      - REACT_APP_BACKEND_URL=http://localhost
+    volumes:
+      - ./frontend/:/frontend
+      - build_folder:/frontend/build
+      - ./frontend/node_modules/:/frontend/node_modules
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+    environment:
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
+    ports:
+      - "5672:5672" #기본포트
+      - "15672:15672" # gui포트
+    expose:
+      - "15672"
+  celery_worker:
+    container_name: celery_worker
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/backend
+    ports: []
+    depends_on:
+      - rabbitmq
+      - redis
+    environment:
+      - C_FORCE_ROOT=true
+    env_file:
+      - ./settings/prod/.env.prod
+    command: sh -c "celery -A backend worker --loglevel=info"
+  redis:
+    container_name: redis
+    image: redis:latest
+    hostname: redis
+    ports:
+      - "6379:6379"
+  # nginx 컨테이너(서버)
+  nginx:
+    build: ./nginx
+    ports:
+      - 80:8080
+    volumes:
+      - static_volume:/backend/staticfiles
+      - media_volume:/backend/mediafiles
+      - build_folder:/var/www/frontend
+    depends_on:
+      - backend
+      - frontend
+# 컨테이너 내려도 데이터 유지되도록 함
 volumes:
-  postgres_data_dev: null
+  postgres_data: null
+  static_volume: null
+  media_volume: null
+  build_folder: null
