@@ -1,7 +1,6 @@
-#배포용, for production
 version: "3"
+
 services:
-  # db 컨테이너
   db:
     image: postgres:12.0-alpine
     volumes:
@@ -12,7 +11,7 @@ services:
       POSTGRES_DB: "eg_db"
     ports:
       - 5432:5432
-  # Django 컨테이너
+
   backend:
     build:
       context: ./backend
@@ -20,32 +19,37 @@ services:
         DJANGO_ALLOWED_HOSTS: "*"
         DJANGO_SECRET_KEY: "*"
         DJANGO_CORS_ORIGIN_WHITELIST: "*"
-    command: gunicorn backend.wsgi --bind 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000
     ports:
       - 8000:8000
     volumes:
-      - static_volume:/backend/staticfiles
-      - media_volume:/backend/mediafiles
       - ./backend/:/backend/
     expose:
       - 8000
     env_file:
-      - ./settings/prod/.env.prod
+      - ./settings/dev/.env.dev
     depends_on:
       - db
+      - rabbitmq
+      - celery_worker
+
   frontend:
+    container_name: frontend
+    restart: unless-stopped
     build:
       context: ./frontend
-      args:
-        API_URL: "*"
-    stdin_open: true
-    tty: true #exit 0 Error
-    environment:
-      - REACT_APP_BACKEND_URL=http://localhost
+    command: ["yarn", "start"]
+    ports:
+      - 3000:3000
     volumes:
-      - ./frontend/:/frontend
-      - build_folder:/frontend/build
+      - ./frontend/:/frontend/
       - ./frontend/node_modules/:/frontend/node_modules
+    environment:
+      - CI=true
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_BACKEND_URL=http://localhost:8000
+    tty: true
+
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3-management-alpine
@@ -57,6 +61,7 @@ services:
       - "15672:15672" # gui포트
     expose:
       - "15672"
+
   celery_worker:
     container_name: celery_worker
     build:
@@ -70,29 +75,15 @@ services:
     environment:
       - C_FORCE_ROOT=true
     env_file:
-      - ./settings/prod/.env.prod
+      - ./settings/dev/.env.dev
     command: sh -c "celery -A backend worker --loglevel=info"
+
   redis:
     container_name: redis
     image: redis:latest
     hostname: redis
     ports:
       - "6379:6379"
-  # nginx 컨테이너(서버)
-  nginx:
-    build: ./nginx
-    ports:
-      - 80:8080
-    volumes:
-      - static_volume:/backend/staticfiles
-      - media_volume:/backend/mediafiles
-      - build_folder:/var/www/frontend
-    depends_on:
-      - backend
-      - frontend
-# 컨테이너 내려도 데이터 유지되도록 함
+
 volumes:
   postgres_data: null
-  static_volume: null
-  media_volume: null
-  build_folder: null
