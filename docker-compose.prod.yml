@@ -69,6 +69,8 @@ services:
       - redis
     environment:
       - C_FORCE_ROOT=true
+    env_file:
+      - ./settings/prod/.env.prod
     command: sh -c "celery -A backend worker --loglevel=info"
   redis:
     container_name: redis
