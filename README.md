@@ -85,23 +85,23 @@ docker-compose -f docker-compose.prod.yml up -d --build
 
 ## 5. 페이지 및 기능 소개
 
-### 회원가입 & 로그인
+### [회원가입 & 로그인]
 ![로그인-회원가입](https://user-images.githubusercontent.com/78795820/192958170-cada15cf-b22a-41d3-afb9-664bab0d3398.gif)
 
 
-### 메인 페이지
+### [메인 페이지]
 ![메인페이지-_online-video-cutter com_](https://user-images.githubusercontent.com/78795820/192958332-4624a12b-c750-4146-9c23-42712ed0c6eb.gif)
 
-### 이미지 업로드
+### [이미지 업로드]
 ![업로드1번-_online-video-cutter com_](https://user-images.githubusercontent.com/78795820/192958435-d840b15e-6d79-48d6-91d8-19e727dcdc2e.gif)
 
-### 결과 페이지
+### [결과 페이지]
 ![결과페이지-_online-video-cutter com_](https://user-images.githubusercontent.com/78795820/192958453-d8d07ce0-3d08-4679-82a2-bac7b731471c.gif)
 
-### 히스토리 페이지
+### [히스토리 페이지]
 ![히스토리페이지-_online-video-cutter com_](https://user-images.githubusercontent.com/78795820/192958460-708154e2-529f-406c-bc5b-7a3fcf6a2e05.gif)
 
-### 반응형 CSS 적용
+### [반응형 CSS 적용]
 ![예시](https://user-images.githubusercontent.com/78795820/189389486-3532cb0c-14fe-478c-b21e-c895eabde211.gif)
 
 ## 6. 팀원
@@ -113,7 +113,8 @@ docker-compose -f docker-compose.prod.yml up -d --build
 
 
 ## 7. Reference
-https://github.com/microsoft/Bringing-Old-Photos-Back-to-Life (사용한 AI)
+https://github.com/microsoft/Bringing-Old-Photos-Back-to-Life
+
 https://medium.com/@dkfud2121/meet-the-past-mtp-9f3df63c4217
 
 ![Footer](https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=footer)
