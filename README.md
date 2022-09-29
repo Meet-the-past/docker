@@ -113,7 +113,8 @@ docker-compose -f docker-compose.prod.yml up -d --build
 
 
 ## 7. Reference
-https://github.com/microsoft/Bringing-Old-Photos-Back-to-Life
+https://github.com/microsoft/Bringing-Old-Photos-Back-to-Life (사용한 AI)
+https://medium.com/@dkfud2121/meet-the-past-mtp-9f3df63c4217
 
 ![Footer](https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=footer)
 
